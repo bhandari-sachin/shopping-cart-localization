@@ -1,0 +1,8 @@
+package com.example.shoppingcart.console.localization.strategy;
+
+public class NormalPricing implements PricingStrategy {
+    @Override
+    public double calculate(double price, int quantity) {
+        return price * quantity;
+    }
+}
