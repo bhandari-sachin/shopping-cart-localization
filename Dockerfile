@@ -19,7 +19,7 @@ WORKDIR /app
 RUN apt-get update && apt-get install -y \
     # --- GTK3 (native dialogs, window decorations) --- \
     libgtk-3-0 \
-    # --- OpenGL (JavaFX hardware rendering) ---
+    # --- OpenGL (JavaFX hardware rendering) --- \
     libgl1 \
     # --- GLib (GTK dependency) ---
     libglib2.0-0 \
