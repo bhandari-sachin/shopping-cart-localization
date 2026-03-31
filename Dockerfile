@@ -50,5 +50,11 @@ ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
 # Run JavaFX app
 CMD ["sh", "-c", "java $JAVA_OPTS \
     --module-path /javafx-sdk/lib \
-    --add-modules javafx.controls,javafx.graphics,javafx.base,javafx.swing \
+    --add-modules javafx.controls,javafx.graphics,javafx.base,javafx.swing,javafx.fxml \
+    --add-opens javafx.graphics/com.sun.javafx.util=ALL-UNNAMED \
+    --add-opens javafx.graphics/com.sun.javafx.application=ALL-UNNAMED \
+    --add-opens javafx.graphics/com.sun.javafx.css=ALL-UNNAMED \
+    --add-opens javafx.base/com.sun.javafx.runtime=ALL-UNNAMED \
+    --add-opens javafx.base/com.sun.javafx.collections=ALL-UNNAMED \
+    --add-opens javafx.fxml/com.sun.javafx.fxml=ALL-UNNAMED \
     -jar app.jar"]
