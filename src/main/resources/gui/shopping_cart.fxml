@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.collections.FXCollections?>
+<?import java.lang.String?>
+
+<VBox spacing="10" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.example.shoppingcart.gui.localization.controller.ShoppingCartController">
+
+    <HBox spacing="10">
+        <Label fx:id="lblLanguage" text="%select.language"/>
+        <ChoiceBox fx:id="choiceLanguage">
+            <items>
+                <FXCollections fx:factory="observableArrayList">
+                    <String fx:value="English"/>
+                    <String fx:value="Finnish"/>
+                    <String fx:value="Swedish"/>
+                    <String fx:value="Japanese"/>
+                    <String fx:value="Arabic"/>
+                </FXCollections>
+            </items>
+        </ChoiceBox>
+    </HBox>
+
+    <HBox spacing="10">
+        <Label fx:id="lblNumItems" text="%prompt.num.items"/>
+        <TextField fx:id="txtNumItems"/>
+    </HBox>
+
+    <Button fx:id="btnGenerate" text="%btn.generate.items" onAction="#generateItemFields"/>
+    <VBox fx:id="itemsContainer" spacing="5"/>
+    <Button fx:id="btnCalculate" text="%btn.calculate.total" onAction="#calculateTotal"/>
+    <Label fx:id="lblTotal" text="%total.cost"/>
+</VBox>
