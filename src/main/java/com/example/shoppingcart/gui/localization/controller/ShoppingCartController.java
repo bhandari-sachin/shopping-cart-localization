@@ -1,19 +1,20 @@
 package com.example.shoppingcart.gui.localization.controller;
 
-import com.example.shoppingcart.gui.localization.UTF8Control;
+import com.example.shoppingcart.gui.localization.db.LocalizationService;
 import com.example.shoppingcart.gui.localization.model.CartCalculator;
 import com.example.shoppingcart.gui.localization.model.CartItem;
 import com.example.shoppingcart.console.localization.strategy.NormalPricing;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.geometry.NodeOrientation;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
+import java.util.Map;
 
 public class ShoppingCartController {
 
@@ -26,43 +27,50 @@ public class ShoppingCartController {
     @FXML private Button btnGenerate;
     @FXML private Button btnCalculate;
 
-    private ResourceBundle bundle;
+    private final LocalizationService localizationService = new LocalizationService();
+    private Map<String, String> messages;
+    private String currentLanguageCode = "en";
     private final CartCalculator calculator = new CartCalculator(new NormalPricing());
     private final List<TextField[]> itemFields = new ArrayList<>();
 
     @FXML
     public void initialize() {
-        bundle = ResourceBundle.getBundle("MessagesBundle", Locale.ENGLISH, new UTF8Control());
+        messages = localizationService.getStrings(currentLanguageCode);
 
         choiceLanguage.getSelectionModel().selectedItemProperty().addListener((obs, oldV, newV) -> {
             switchLanguage(newV);
         });
+
+        choiceLanguage.getSelectionModel().select("English");
+        updateLabels();
+        Platform.runLater(this::updateLabels);
     }
 
     private void switchLanguage(String lang) {
-        Locale locale;
+        if (lang == null) {
+            return;
+        }
+
+        boolean rtl = false;
         switch (lang) {
             case "Finnish":
-                locale = new Locale("fi", "FI");
-                setLayoutDirection(false);
+                currentLanguageCode = "fi";
                 break;
             case "Swedish":
-                locale = new Locale("sv", "SE");
-                setLayoutDirection(false);
+                currentLanguageCode = "sv";
                 break;
             case "Japanese":
-                locale = new Locale("ja", "JP");
-                setLayoutDirection(false);
+                currentLanguageCode = "ja";
                 break;
             case "Arabic":
-                locale = new Locale("ar", "AR");
-                setLayoutDirection(true);
+                currentLanguageCode = "ar";
+                rtl = true;
                 break;
             default:
-                locale = new Locale("en", "US");
-                setLayoutDirection(false);
+                currentLanguageCode = "en";
         }
-        bundle = ResourceBundle.getBundle("MessagesBundle", locale, new UTF8Control());
+        setLayoutDirection(rtl);
+        messages = localizationService.getStrings(currentLanguageCode);
         updateLabels();
     }
 
@@ -75,11 +83,16 @@ public class ShoppingCartController {
     }
 
     private void updateLabels() {
-        lblLanguage.setText(bundle.getString("select.language"));
-        lblNumItems.setText(bundle.getString("prompt.num.items"));
-        btnGenerate.setText(bundle.getString("btn.generate.items"));
-        btnCalculate.setText(bundle.getString("btn.calculate.total"));
-        lblTotal.setText(bundle.getString("total.cost"));
+        lblLanguage.setText(messages.getOrDefault("select.language", "Select Language:"));
+        lblNumItems.setText(messages.getOrDefault("prompt.num.items", "Enter number of items:"));
+        btnGenerate.setText(messages.getOrDefault("btn.generate.items", "Generate Items"));
+        btnCalculate.setText(messages.getOrDefault("btn.calculate.total", "Calculate Total"));
+        lblTotal.setText(messages.getOrDefault("total.cost", "Total cost:"));
+
+        if (itemsContainer.getScene() != null && itemsContainer.getScene().getWindow() instanceof Stage stage) {
+            stage.setTitle(messages.getOrDefault("app.title", "Shopping Cart"));
+        }
+
         refreshItemRows();
     }
 
@@ -94,11 +107,11 @@ public class ShoppingCartController {
 
             // First child of each HBox is the "Item N" label — update it
             Label itemLabel = (Label) row.getChildren().get(0);
-            itemLabel.setText(bundle.getString("item.prompt") + " " + (i + 1));
+            itemLabel.setText(messages.getOrDefault("item.prompt", "Item") + " " + (i + 1));
 
             // Update prompt text on price and quantity fields
-            itemFields.get(i)[0].setPromptText(bundle.getString("prompt.price"));
-            itemFields.get(i)[1].setPromptText(bundle.getString("prompt.quantity"));
+            itemFields.get(i)[0].setPromptText(messages.getOrDefault("prompt.price", "Price"));
+            itemFields.get(i)[1].setPromptText(messages.getOrDefault("prompt.quantity", "Quantity"));
         }
     }
 
@@ -110,12 +123,12 @@ public class ShoppingCartController {
         int numItems = Integer.parseInt(txtNumItems.getText());
         for (int i = 0; i < numItems; i++) {
             TextField price = new TextField();
-            price.setPromptText(bundle.getString("prompt.price"));
+            price.setPromptText(messages.getOrDefault("prompt.price", "Price"));
 
             TextField quantity = new TextField();
-            quantity.setPromptText(bundle.getString("prompt.quantity"));
+            quantity.setPromptText(messages.getOrDefault("prompt.quantity", "Quantity"));
 
-            HBox row = new HBox(10, new Label(bundle.getString("item.prompt") + " " + (i + 1)), price, quantity);
+            HBox row = new HBox(10, new Label(messages.getOrDefault("item.prompt", "Item") + " " + (i + 1)), price, quantity);
             itemsContainer.getChildren().add(row);
 
             itemFields.add(new TextField[]{price, quantity});
@@ -133,6 +146,6 @@ public class ShoppingCartController {
         }
 
         double total = calculator.calculateCartTotal(items);
-        lblTotal.setText(bundle.getString("total.cost") + " " + total);
+        lblTotal.setText(messages.getOrDefault("total.cost", "Total cost:") + " " + total);
     }
 }
